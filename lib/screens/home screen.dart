@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:visioapp/screens/FAQ.dart';
 import 'package:visioapp/screens/folder%20screen.dart';
 import 'package:visioapp/screens/splash%20screen.dart';
+import 'package:visioapp/screens/Profile%20screen.dart'; // Import the ProfileScreen
+
+// Define a list of folder names
+final List<String> folderNames = [
+  'Photos',
+  'Videos',
+  'Documents',
+  'Projects',
+  'Music',
+  'Work',
+];
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,12 +68,13 @@ class HomeScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Profile (on hold)'),
+              title: const Text('Profile'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Profile is on hold'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(), // Navigate to Profile page
                   ),
                 );
               },
