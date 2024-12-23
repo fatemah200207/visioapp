@@ -1,84 +1,93 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_editor/image_editor.dart';
-import 'dart:io';
+import 'package:pro_image_editor/pro_image_editor.dart'; // Ensure correct import
 
 class FileScreen extends StatefulWidget {
-  const FileScreen({Key? key}) : super(key: key);
+  const FileScreen({super.key});
 
   @override
-  _FileScreenState createState() => _FileScreenState();
+  State<FileScreen> createState() => _FileScreenState();
 }
 
 class _FileScreenState extends State<FileScreen> {
-  File? _image;
+  List<String> imageFiles = [
+    'assets/images/sample1.jpg',
+    'assets/images/sample2.jpg',
+    'assets/images/sample3.jpg',
+  ];
 
-  // Pick an image from the gallery
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  Future<void> _editImage(String imagePath) async {
+    try {
+      // Example: Navigating to the editor
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProImageEditorScreen(
+            imagePath: imagePath, // Pass the path to the editor
+          ),
+        ),
+      );
 
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+      if (result != null) {
+        print('Editing completed, new image path: $result');
+        // Update state if necessary
+      } else {
+        print('Editing canceled');
+      }
+    } catch (e) {
+      print('Error during editing: $e');
     }
-  }
-
-  // Apply a grayscale filter as an example
-  Future<void> _applyGrayscaleFilter() async {
-    if (_image == null) return;
-
-    final imageEditorOption = ImageEditorOption()
-      ..addOption(ColorOption.grayscale());
-
-    final editedImage = await ImageEditor.editImage(
-      image: _image!.readAsBytesSync(),
-      imageEditorOption: imageEditorOption,
-    );
-
-    setState(() {
-      _image = File.fromRawPath(editedImage);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("File Screen"),
+        title: const Text('File Screen'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          if (_image != null)
-            Expanded(
-              child: Image.file(
-                _image!,
-                fit: BoxFit.contain,
-              ),
-            )
-          else
-            const Expanded(
-              child: Center(
-                child: Text("No image selected"),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(16.0),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+        ),
+        itemCount: imageFiles.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () => _editImage(imageFiles[index]),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                image: DecorationImage(
+                  image: AssetImage(imageFiles[index]),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ElevatedButton(
-                onPressed: _pickImage,
-                child: const Text("Pick Image"),
-              ),
-              ElevatedButton(
-                onPressed: _applyGrayscaleFilter,
-                child: const Text("Apply Grayscale"),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-        ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Mock implementation of ProImageEditorScreen
+class ProImageEditorScreen extends StatelessWidget {
+  final String imagePath;
+
+  const ProImageEditorScreen({required this.imagePath, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Pro Image Editor'),
+      ),
+      body: Center(
+        child: Text('Editing image: $imagePath'),
       ),
     );
   }

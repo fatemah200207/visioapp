@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class FolderPage extends StatelessWidget {
-  final int index;
+class FolderScreen extends StatelessWidget {
+  final int folderIndex;
 
-  const FolderPage({Key? key, required this.index}) : super(key: key);
+  const FolderScreen({Key? key, required this.folderIndex}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // Make the AppBar transparent
+        backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
@@ -41,7 +41,7 @@ class FolderPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Contents of Folder ${index + 1}',
+                'Contents of Folder ${folderIndex + 1}',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -50,9 +50,12 @@ class FolderPage extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  // Add functionality to add files or perform folder-specific actions here
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Feature coming soon for Folder ${index + 1}!')),
+                    SnackBar(
+                      content: Text(
+                        'Feature coming soon for Folder ${folderIndex + 1}!',
+                      ),
+                    ),
                   );
                 },
                 child: const Text('Add Files'),
