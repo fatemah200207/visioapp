@@ -19,25 +19,18 @@ class FAQPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent, // Make the AppBar transparent
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
-          'FAQ',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFB2EBF2), Color(0xFFFFCDD2)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+          'My Studio',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
         ),
+        centerTitle: true,
       ),
       body: Container(
         decoration: const BoxDecoration(

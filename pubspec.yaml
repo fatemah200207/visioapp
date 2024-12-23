@@ -37,6 +37,8 @@ dependencies:
   flutter_native_splash: ^2.4.3
   shared_preferences: ^2.2.0
   image_picker: ^0.8.7+4
+  pro_image_editor: ^6.2.3
+  #image_editor: ^1.6.0
 flutter_native_splash:
   android: true
   ios: true

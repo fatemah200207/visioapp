@@ -11,15 +11,15 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  XFile? _profileImage; // Holds the selected profile image
   String? _savedImagePath; // Holds the saved file path
 
   @override
   void initState() {
     super.initState();
-    _loadSavedImage(); // Load the saved image path
+    _loadSavedImage(); // Load the saved image path on app start
   }
 
+  /// Load the saved image path from SharedPreferences
   Future<void> _loadSavedImage() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -27,23 +27,21 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  /// Pick an image using the ImagePicker
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery, // Use ImageSource.camera for camera
+    );
 
     if (image != null) {
       setState(() {
-        _profileImage = image;
-      });
-
-      // Save the image path
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('profileImagePath', image.path);
-
-      // Update the saved path
-      setState(() {
         _savedImagePath = image.path;
       });
+
+      // Save the image path to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('profileImagePath', image.path);
     }
   }
 
@@ -72,121 +70,50 @@ class _ProfilePageState extends State<ProfilePage> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            // Profile Picture
-            GestureDetector(
-              onTap: _pickImage, // Opens the image picker when tapped
-              child: CircleAvatar(
-                radius: 60,
-                backgroundImage: _savedImagePath != null
-                    ? FileImage(File(_savedImagePath!))
-                    : const AssetImage('assets/default_profile.png')
-                as ImageProvider, // Fallback to a default profile image
-                child: _savedImagePath == null
-                    ? const Icon(
-                  Icons.add_a_photo,
-                  size: 30,
-                  color: Colors.white,
-                )
-                    : null,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 40),
+              GestureDetector(
+                onTap: _pickImage, // Opens the image picker when tapped
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.grey[300], // Placeholder background color
+                  backgroundImage: _savedImagePath != null
+                      ? FileImage(File(_savedImagePath!)) // Show saved image
+                      : null, // No default image
+                  child: _savedImagePath == null
+                      ? const Icon(
+                    Icons.add_a_photo,
+                    size: 30,
+                    color: Colors.black,
+                  )
+                      : null,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            // Name and Username
-            const Text(
-              'Amy Young',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+              const SizedBox(height: 20),
+              // Profile Details
+              const Text(
+                'Amy Young',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            const Text(
-              'Amy245',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
+              const SizedBox(height: 10),
+              const Text(
+                'Amy245',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black54,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            // Information
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: const [
-                      Icon(Icons.calendar_today, color: Colors.black),
-                      SizedBox(width: 10),
-                      Text(
-                        '12/12/2003',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    children: const [
-                      Icon(Icons.phone, color: Colors.black),
-                      SizedBox(width: 10),
-                      Text(
-                        '01120551806',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    children: const [
-                      Icon(Icons.email, color: Colors.black),
-                      SizedBox(width: 10),
-                      Text(
-                        'Amyyoung201333@gmail.com',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  // Favorites
-                  Row(
-                    children: const [
-                      Icon(Icons.favorite, color: Colors.black),
-                      SizedBox(width: 10),
-                      Text(
-                        'Favorites',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  // Log Out
-                  GestureDetector(
-                    onTap: () {
-                      // Add your logout functionality here
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Logged out')),
-                      );
-                    },
-                    child: Row(
-                      children: const [
-                        Icon(Icons.logout, color: Colors.black),
-                        SizedBox(width: 10),
-                        Text(
-                          'Log Out',
-                          style: TextStyle(fontSize: 16, color: Colors.black),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+              const Spacer(), // Pushes content upward and ensures the layout stretches
+            ],
+          ),
         ),
       ),
     );
