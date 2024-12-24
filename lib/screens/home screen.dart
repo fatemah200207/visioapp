@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visioapp/screens/FAQ.dart';
 import 'package:visioapp/screens/Profile%20screen.dart';
+import 'package:visioapp/screens/folder%20screen.dart';
+import 'package:visioapp/screens/help%20screeen.dart';
+import 'package:visioapp/screens/login%20screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,6 +41,27 @@ class _HomeScreenState extends State<HomeScreen> {
   _saveFolders() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('folders', folderNames); // Save the folder list
+  }
+
+  // Function to clear folder names from SharedPreferences
+  _clearFolders() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      folderNames = []; // Clear the folder list
+    });
+    prefs.remove('folders'); // Remove the stored folder list from SharedPreferences
+  }
+
+  // Function to delete a folder
+  _deleteFolder(int index) async {
+    setState(() {
+      folderNames.removeAt(index); // Remove the folder from the list
+    });
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('folders', folderNames); // Save the updated folder list
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Folder "${folderNames[index]}" deleted')),
+    );
   }
 
   void _addNewFolder(String folderName) {
@@ -112,18 +136,21 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
+              leading: const Icon(Icons.person),
+              title: const Text('Profile'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Logged out')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(),
+                  ),
                 );
               },
             ),
             ListTile(
-              leading: const Icon(Icons.help),
-              title: const Text('FAQ/Help'),
+              leading: const Icon(Icons.question_answer_outlined),
+              title: const Text('FAQ'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -135,15 +162,26 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Profile'),
+              leading: const Icon(Icons.help),
+              title: const Text('Help'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfilePage(),
+                    builder: (context) => HelpScreen(),
                   ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()), // Replace with your actual login page widget
+                      (route) => false, // Clear all routes
                 );
               },
             ),
@@ -215,6 +253,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               );
                             },
+                            onLongPress: () {
+                              // Show a confirmation dialog to delete the folder
+                              _showDeleteFolderDialog(index);
+                            },
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -249,51 +291,38 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xFFB2EBF2),
         onPressed: _showAddFolderDialog,
         child: const Icon(Icons.add),
       ),
     );
   }
-}
 
-class FolderPage extends StatelessWidget {
-  final String folderName;
-
-  const FolderPage({required this.folderName, Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: Text(
-          folderName, // Display folder name in AppBar
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFB2EBF2), Color(0xFFFFCDD2)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            'Welcome to the $folderName folder!',
-            style: const TextStyle(fontSize: 18),
-          ),
-        ),
-      ),
+  // Function to show the delete folder confirmation dialog
+  void _showDeleteFolderDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Folder'),
+          content: Text('Are you sure you want to delete "${folderNames[index]}"?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _deleteFolder(index); // Delete the folder
+                Navigator.pop(context); // Close the dialog
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:visioapp/screens/file%20screen.dart';
+//import 'package:visioapp/screens/file_screen.dart'; // Ensure the correct path to FileScreen is imported
 
-class FolderScreen extends StatelessWidget {
-  final int folderIndex;
+class FolderPage extends StatelessWidget {
+  final String folderName;
 
-  const FolderScreen({Key? key, required this.folderIndex}) : super(key: key);
+  const FolderPage({required this.folderName, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +14,9 @@ class FolderScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          'My Studio',
-          style: TextStyle(
+        title: Text(
+          folderName, // Display folder name in AppBar
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.black,
@@ -30,38 +32,30 @@ class FolderScreen extends StatelessWidget {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.folder,
-                size: 100,
-                color: Colors.blue,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Contents of Folder ${folderIndex + 1}',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+        child: Column(
+          children: [
+            const SizedBox(height: 40),
+            Expanded(
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to FileScreen
+                      /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FileScreen(),
+                        ),
+                      );*/
+                    },
+                    child: const Text('Add Files'),
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Feature coming soon for Folder ${folderIndex + 1}!',
-                      ),
-                    ),
-                  );
-                },
-                child: const Text('Add Files'),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

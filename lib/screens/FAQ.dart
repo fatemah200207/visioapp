@@ -23,7 +23,7 @@ class FAQPage extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
-          'My Studio',
+          'FAQ',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,

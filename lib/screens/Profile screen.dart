@@ -12,19 +12,38 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   String? _savedImagePath; // Holds the saved file path
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _birthdateController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadSavedImage(); // Load the saved image path on app start
+    _loadSavedData(); // Load saved data
   }
 
-  /// Load the saved image path from SharedPreferences
   Future<void> _loadSavedImage() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _savedImagePath = prefs.getString('profileImagePath');
     });
+  }
+
+  Future<void> _loadSavedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _usernameController.text = prefs.getString('username') ?? '';
+      _emailController.text = prefs.getString('email') ?? '';
+      _phoneController.text = prefs.getString('phone') ?? '';
+      _birthdateController.text = prefs.getString('birthdate') ?? '';
+    });
+  }
+
+  Future<void> _saveData(String key, String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, value);
   }
 
   /// Pick an image using the ImagePicker
@@ -62,60 +81,117 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFB2EBF2), Color(0xFFFFCDD2)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: SizedBox.expand(
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFB2EBF2), Color(0xFFFFCDD2)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              GestureDetector(
-                onTap: _pickImage, // Opens the image picker when tapped
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Colors.grey[300], // Placeholder background color
-                  backgroundImage: _savedImagePath != null
-                      ? FileImage(File(_savedImagePath!)) // Show saved image
-                      : null, // No default image
-                  child: _savedImagePath == null
-                      ? const Icon(
-                    Icons.add_a_photo,
-                    size: 30,
-                    color: Colors.black,
-                  )
-                      : null,
-                ),
+
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                children: [
+                  const SizedBox(height: 40),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage: _savedImagePath != null
+                          ? FileImage(File(_savedImagePath!))
+                          : null,
+                      child: _savedImagePath == null
+                          ? const Icon(
+                        Icons.add_a_photo,
+                        size: 30,
+                        color: Colors.black,
+                      )
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 40), // Added extra space below the image
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20), // Adjust the top padding
+                    child: Column(
+                      children: [
+                        // Username
+                        _buildProfileField(
+                          icon: Icons.person,
+                          label: 'Username',
+                          controller: _usernameController,
+                          saveKey: 'username',
+                        ),
+                        const SizedBox(height: 15),
+                        // Birthdate
+                        _buildProfileField(
+                          icon: Icons.calendar_today,
+                          label: 'Birthdate',
+                          controller: _birthdateController,
+                          saveKey: 'birthdate',
+                        ),
+                        const SizedBox(height: 15),
+                        // Phone
+                        _buildProfileField(
+                          icon: Icons.phone,
+                          label: 'Phone Number',
+                          controller: _phoneController,
+                          saveKey: 'phone',
+                          keyboardType: TextInputType.phone,
+                        ),
+                        const SizedBox(height: 15),
+                        // Email
+                        _buildProfileField(
+                          icon: Icons.email,
+                          label: 'Email',
+                          controller: _emailController,
+                          saveKey: 'email',
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
               ),
-              const SizedBox(height: 20),
-              // Profile Details
-              const Text(
-                'Amy Young',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Amy245',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
-                ),
-              ),
-              const Spacer(), // Pushes content upward and ensures the layout stretches
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildProfileField({
+    required IconData icon,
+    required String label,
+    required TextEditingController controller,
+    required String saveKey,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 30, color: Colors.black54),
+        const SizedBox(width: 15),
+        Expanded(
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+              hintText: label,
+              hintStyle: const TextStyle(color: Colors.black54),
+              border: InputBorder.none, // No underline
+            ),
+            style: const TextStyle(fontSize: 16, color: Colors.black),
+            onChanged: (value) {
+              _saveData(saveKey, value); // Save data whenever the field changes
+            },
+          ),
+        ),
+      ],
     );
   }
 }
